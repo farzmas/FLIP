@@ -1,12 +1,12 @@
-from flip.parameter_parser import parameter_parser
-from utils import tab_printer, read_data
-from flip.walk_generator import walk_generator
-from flip.utils import load_embd_from_txt, Logger, logger_exist, load_logger, walk_exist
-from flip.flip import DW_GAN_LP
+from utils.parameter_parser import parameter_parser
+from utils.utils import tab_printer, read_data, load_embd_from_txt, walk_exist
+from utils.eval import get_accuracy_scores, get_modularity
+from utils.logger import Logger
+from skipGram.walk_generator import walk_generator
+from algs.flip import DW_GAN_LP
+
 from tqdm import tqdm
 import numpy as np
-from sklearn.model_selection import train_test_split
-from linkprediction import get_accuracy_scores, get_modularity
 
 def main():	
 	args = parameter_parser()
