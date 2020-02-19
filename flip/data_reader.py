@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-np.random.seed(12345)
+
 
 
 class DataReader:
@@ -14,57 +14,56 @@ class DataReader:
 		self.discards = []
 		self.negpos = 0
 
-		self.word2id = dict()
-		self.id2word = dict()
+		self.node2id = dict()
+		self.id2node = dict()
 		self.sentences_count = 0
 		self.token_count = 0
-		self.word_frequency = dict()
+		self.node_frequency = dict()
 
 		self.inputFileName = inputFileName
-		self.read_words(min_count)
+		self.read_nodes(min_count)
 		self.initTableNegatives()
 		self.initTableDiscards()
 
-	def read_words(self, min_count):
-		word_frequency = dict()
+	def read_nodes(self, min_count):
+		node_frequency = dict()
 		for line in open(self.inputFileName, encoding="utf8"):
 			line = line.split()
 			if len(line) > 1:
 				line = [int(x) for x in line]
 				self.sentences_count += 1
-				for word in line:
+				for node in line:
 					self.token_count += 1
-					word_frequency[word] = word_frequency.get(word, 0) + 1
-					if self.token_count % 1000000 == 0:
-						print("Read " + str(int(self.token_count / 1000000)) + "M words.")
-
+					node_frequency[node] = node_frequency.get(node, 0) + 1
+					# if self.token_count % 1000000 == 0:
+					# 	#print("Read " + str(int(self.token_count / 1000000)) + "M nodes.")
 		wid = 0
-		for w in sorted(word_frequency.keys()):
-			c = word_frequency[w]
+		for w in sorted(node_frequency.keys()):
+			c = node_frequency[w]
 			if c < min_count:
 				continue
-			self.word2id[w] = wid
-			self.id2word[wid] = w
-			self.word_frequency[wid] = c
+			self.node2id[w] = wid
+			self.id2node[wid] = w
+			self.node_frequency[wid] = c
 			wid += 1
-		print("Total embeddings: " + str(len(self.word2id)))
+		#print("Total embeddings: " + str(len(self.node2id)))
 
 	def initTableDiscards(self):
 		t = 0.0001
-		f = np.array(list(self.word_frequency.values())) / self.token_count
+		f = np.array(list(self.node_frequency.values())) / self.token_count
 		self.discards = np.sqrt(t / f) + (t / f)
 
 	def initTableNegatives(self):
-		pow_frequency = np.array(list(self.word_frequency.values())) ** 0.5
-		words_pow = sum(pow_frequency)
-		ratio = pow_frequency / words_pow
+		pow_frequency = np.array(list(self.node_frequency.values())) ** 0.5
+		nodes_pow = sum(pow_frequency)
+		ratio = pow_frequency / nodes_pow
 		count = np.round(ratio * DataReader.NEGATIVE_TABLE_SIZE)
 		for wid, c in enumerate(count):
 			self.negatives += [wid] * int(c)
 		self.negatives = np.array(self.negatives)
 		np.random.shuffle(self.negatives)
 
-	def getNegatives(self, target, size):  # TODO check equality with target
+	def getNegatives(self, target, size): 
 		response = self.negatives[self.negpos:self.negpos + size]
 		self.negpos = (self.negpos + size) % len(self.negatives)
 		if len(response) != size:
@@ -74,7 +73,7 @@ class DataReader:
 
 # -----------------------------------------------------------------------------------------------------------------
 
-class Word2vecDataset(Dataset):
+class node2vecDataset(Dataset):
 	def __init__(self, data, window_size):
 		self.data = data
 		self.window_size = window_size
@@ -92,15 +91,15 @@ class Word2vecDataset(Dataset):
 
 			if len(line) > 1:
 				
-				words = line.split()
-				words = [int(x) for x in words]
-				if len(words) > 1:
-					word_ids = [self.data.word2id[w] for w in words if
-								w in self.data.word2id and np.random.rand() < self.data.discards[self.data.word2id[w]]]
+				nodes = line.split()
+				nodes = [int(x) for x in nodes]
+				if len(nodes) > 1:
+					node_ids = [self.data.node2id[w] for w in nodes if
+								w in self.data.node2id and np.random.rand() < self.data.discards[self.data.node2id[w]]]
 
 					boundary = np.random.randint(1, self.window_size)
-					return [(u, v, self.data.getNegatives(v, 5)) for i, u in enumerate(word_ids) for j, v in
-							enumerate(word_ids[max(i - boundary, 0):i + boundary]) if u != v]
+					return [(u, v, self.data.getNegatives(v, 5)) for i, u in enumerate(node_ids) for j, v in
+							enumerate(node_ids[max(i - boundary, 0):i + boundary]) if u != v]
 
 	@staticmethod
 	def collate(batches):

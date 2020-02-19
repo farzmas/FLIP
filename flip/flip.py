@@ -9,10 +9,10 @@ import torch.nn.functional as F
 import torch.optim as opt  
 import pickle as pk
 from  flip.skipGram import SkipGramModel
-from flip.data_reader import DataReader, Word2vecDataset
+from flip.data_reader import DataReader, node2vecDataset
 from torch.utils.data import DataLoader
-from linkprediction import link_predict, get_accuracy_scores, get_modularity
-from sklearn.model_selection import train_test_split
+from linkprediction import  get_accuracy_scores, get_modularity
+
 
 def xavier_init(m):
 	""" Xavier initialization """
@@ -66,15 +66,15 @@ class Link_prediction(nn.Module):
 class DW_GAN_LP(object):
 	def __init__(self, args, G, communities, train_data ,f_id = '', logger = None):
 		self.args = args 
-		self.n = G.number_of_nodes()
-		self.G = G
-		self.f_id = f_id
-		self.file_name = f_id+ self.args.file_name.split('.')[0] +'.txt'
-		self.data = DataReader(self.args.walk_path+self.file_name, 1)
-		dataset = Word2vecDataset(self.data, self.args.window_size)
+		self.n = G.number_of_nodes() # number of nodes
+		self.G = G # networkx graph 
+		self.f_id = f_id #  
+		self.file_name = f_id+ self.args.file_name.split('.')[0] +'.txt' # the generated walks file name
+		self.data = DataReader(self.args.walk_path+self.file_name, 1)  # walks generated for the deepwalk 
+		dataset = node2vecDataset(self.data, self.args.window_size)
 		self.dataloader = DataLoader(dataset, batch_size=self.args.batch_size,
 									 shuffle=False, num_workers=0, collate_fn=dataset.collate)
-		self.train_data = train_data
+		self.train_data = train_data # positive and negative examples for link prediction 
 		self.train_init(communities)
 		self.logger = logger
 		self.Dis = Discriminator(self.args, len(communities))
@@ -176,14 +176,14 @@ class DW_GAN_LP(object):
 				self.logger.avg_losses_d[self.f_id].append((round(np.mean(losses_d),4) , round(np.var(losses_d),4)))
 				self.logger.avg_losses_g[self.f_id].append((round(np.mean(losses_g),4) , round(np.var(losses_g),4)))
 				self.logger.avg_losses_l[self.f_id].append((round(np.mean(losses_l),4) , round(np.var(losses_l),4)))
-		self.Gen.save_embedding(self.data.id2word,self.args.embedding_path+ self.file_name)
+		self.Gen.save_embedding(self.data.id2node,self.args.embedding_path+ self.file_name)
 		if valid_data is None:
 			return self.test(self.train_data)
 		else:
 			return self.test(self.train_data) , self.test(valid_data)
 
 	def train_init(self,communities):
-		print('intializing the network')
+		#print('intializing the network')
 		#self.labels_lp = torch.zeros(self.train_data.shape[0], 1)
 		#self.labels_c = torch.zeros(self.train_data.shape[0], 1)
 		self.labels_lp = list()

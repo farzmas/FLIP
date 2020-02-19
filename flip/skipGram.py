@@ -4,8 +4,8 @@ import torch.nn.functional as F
 from torch.nn import init
 
 """
-    u_embedding: Embedding for center word.
-    v_embedding: Embedding for neighbor words.
+    u_embedding: Embedding for center node.
+    v_embedding: Embedding for neighbor nodes.
 """
 
 class SkipGramModel(nn.Module):
@@ -39,10 +39,10 @@ class SkipGramModel(nn.Module):
     def return_embedding(self):
         return self.u_embeddings.weight.data
 
-    def save_embedding(self, id2word, file_name):
+    def save_embedding(self, id2node, file_name):
         embedding = self.u_embeddings.weight.cpu().data.numpy()
         with open(file_name, 'w') as f:
-            f.write('%d %d\n' % (len(id2word), self.emb_dimension))
-            for wid, w in id2word.items():
+            f.write('%d %d\n' % (len(id2node), self.emb_dimension))
+            for wid, w in id2node.items():
                 e = ' '.join(map(lambda x: str(x), embedding[wid]))
                 f.write('%s %s\n' % (str(w), e))
