@@ -10,18 +10,17 @@ To run the algorithm on Dutch School friendship network, execute the following c
 ```shell-script
 python main.py
 ```
-you can set the baseline algoirthm as input to greedy post-processing using --algorithm option, for example:
+you can set the baseline algoirthm using --algorithm option. The link prediciton results of baseline will be use as input to the greedy post-processing algoirth. For example to use jacard:
 
 ```shell-script
 python main.py --algorithm jac
 ```
-
-you can change the network to facebook as follow:
+you can change the input network to facebook as follow:
 
 ```shell-script
 python main.py --file-name facebook.pk
 ```
-you can check other available options by following command
+you can check other available options by following command:
 
 ```shell-script
 python main.py --help
