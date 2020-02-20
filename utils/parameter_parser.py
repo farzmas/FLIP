@@ -59,8 +59,8 @@ def parameter_parser():
 
 	parser.add_argument("--test-size",
 						type = float,
-						default = 0.95,
-					help = "link prediction test size. Default is 0.5 .")
+						default = 0.8,
+					help = "link prediction test size. Default is 0.8 .")
 
 	parser.add_argument("--number-of-walks",
 						type = int,

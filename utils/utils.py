@@ -34,33 +34,9 @@ def save_embd(embd, args):
     pk.dump(embd, file )
     file.close()
 
-def load_embd(args):
-    file = open(args.output_folder+args.file_name,'rb')
-    embd = pk.load(file )
-    file.close()
-    return embd
-
-
-def load_embd_from_txt(args):
-    embds = []
-    for ct in range(10):
-        file_name = args.file_name.split('.')[0] +'.txt'
-        file_ = open(args.embedding_path+ str(ct)+ file_name, 'r')
-        line = file_.readline().strip().split()
-        embd = np.zeros((int(line[0]),int(line[1])))
-        for line in file_:
-            if len(line)>2:
-                line = line.strip().split()
-                node = int(line[0])
-                line = [float(x) for x in line[1:]]
-                embd[node,:] = np.array(line)
-        embds.append(embd)
-    return embds
-
-
-def walk_exist(args, i):
+def walk_exist(args):
     # only check one incident 
-    path = args.walk_path+ str(i) +args.file_name.split('.')[0] +'.txt'
+    path = args.walk_path +args.file_name.split('.')[0] +'.txt'
     #print(path)
     return os.path.isfile(path)
 
