@@ -3,7 +3,7 @@ This repository provides a reference implementation of FLIP and greedy post proc
 
 ## How to use:
 
-The The file main.py contains code to use flip and greedy post-processing algorithms Both algorithms expects as input the protected feature value(community membership), training graph, and negative/positive link examples. The input files for Dutch School friendship network and facebook can be fine in ./data/graph/ directory in pickle3 binary format. 
+The file main.py contains code to use flip and greedy post-processing algorithms Both algorithms expects as input the protected feature value(community membership), training graph, and negative/positive link examples. The input files for Dutch School friendship network and facebook can be fine in ./data/graph/ directory in pickle3 binary format. 
 
 
 To run the algorithm on Dutch School friendship network, execute the following command from the project home directory:
