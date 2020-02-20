@@ -1,2 +1,7 @@
 # Bursting the Filter Bubble: Fairness-Aware Network Link Prediction
-Implementation of "Bursting the Filter Bubble: Fairness-Aware Network Link Prediction" paper. 
+This repository provides a reference implementation of FLIP and greedy post processing algorithms as described in[1]:
+
+
+
+# Refrence
+[1] 
